@@ -3,15 +3,20 @@
 *	@version 1.0.0
 */
 
-public class Neuron<T extends NeuronalData> implements Node<T>
+public class Neuron<T extends NeuronalData>
 {
 	private NeuronalData data;
 	private double input;
 	private double output;
+	private double desiredOutcome;
+	private double performancePartialDerivative;
+	private double performancePrepartialDerivative;
+	private boolean stateUnchanged = false;
 
 	private Neuron(T data)
 	{ this.data = data; }
 
+	// Static factory
 	public static Neuron getNeuron(double weight, double threshold, Node previousNode, Node nextNode)
 	{ return new Neuron<NeuronalData>(new NeuronalData(weight, threshold, previousNode, nextNode)); }
 	public static Neuron getNeuron_previous(double weight, double threshold, Node previousNode)
@@ -29,8 +34,41 @@ public class Neuron<T extends NeuronalData> implements Node<T>
 	public static Neuron getNeuron(double weight)
 	{ return new Neuron<NeuronalData>(new NeuronalData(weight, 0d, null, null)); }
 
-	public double output(double input)
-	{ return output = (1.0 / (1 + Math.exp(-1 * input))); }
+	// public double getPerformancePartialDerivative(double desiredOutcome)
+	// {
+	// 	if(!stateUnchanged)
+	// 		throw new IllegalArgumentException();
+
+	// 	return getPerformancePartialDerivative(input, desiredOutcome);
+	// }
+	// public double getPerformancePartialDerivative(double input, double desiredOutcome)
+	// {
+	// 	if(!stateUnchanged || this.input != input)
+	// 		getOutput(input);
+
+	// 	// performancePartialDerivative = getPerformancePartialDerivative()
+
+	// 	return performancePartialDerivative;
+	// }
+	// private double getPerformancePrepartialDerivative(double input, double desiredOutcome)
+	// {
+	// 	if(!stateUnchanged || this.input != input || this.desiredOutcome != desiredOutcome)
+	// 	{
+	// 		getOutput(input);
+
+	// 	}
+	// 	else
+	// 	{
+	// 		return performancePrepartialDerivative;
+	// 	}
+	// }
+
+	public double getOutput(double input)
+	{
+		return output = (1.0 / (1 + Math.exp(-1 * (input - data.getThreshold()))));
+	}
+
+	// Getters and Setters
 	public double setWeight(double weight)
 	{ return data.setWeight(weight); }
 	public double setThreshold(double threshold)
