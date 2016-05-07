@@ -1,88 +1,192 @@
-/**
-*	@author Jaewan Yun (Jay50@pitt.edu)
-*	@version 1.0.0
-*/
-
-public class Neuron<T extends NeuronalData>
+public class Neuron
 {
-	private NeuronalData data;
+	private static final double step = 0.5;
+
+	private JayList<Double> weight;
+	private JayList<Neuron> parent;
+	private JayList<Neuron> child;
+
+	private double threshold = 0.0;	// For now
+
 	private double input;
+	private double product;
 	private double output;
-	private double desiredOutcome;
-	private double performancePartialDerivative;
-	private double performancePrepartialDerivative;
-	private boolean stateUnchanged = false;
+	private double sigma;
+	private double rate;
 
-	private Neuron(T data)
-	{ this.data = data; }
+	// For output neurons
+	private double desired;
 
-	// Static factory
-	public static Neuron getNeuron(double weight, double threshold, Node previousNode, Node nextNode)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, threshold, previousNode, nextNode)); }
-	public static Neuron getNeuron_previous(double weight, double threshold, Node previousNode)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, threshold, previousNode, null)); }
-	public static Neuron getNeuron_next(double weight, double threshold, Node nextNode)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, threshold, null, nextNode)); }
-	public static Neuron getNeuron(double weight, double threshold)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, threshold, null, null)); }
-	public static Neuron getNeuron(double weight, Node previousNode, Node nextNode)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, 0d, previousNode, nextNode)); }
-	public static Neuron getNeuron_previous(double weight, Node previousNode)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, 0d, previousNode, null)); }
-	public static Neuron getNeuron_next(double weight, Node nextNode)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, 0d, null, nextNode)); }
-	public static Neuron getNeuron(double weight)
-	{ return new Neuron<NeuronalData>(new NeuronalData(weight, 0d, null, null)); }
+	private boolean validState;
+	private boolean uptodateIOput;
+	private boolean uptodateSigma;
 
-	// public double getPerformancePartialDerivative(double desiredOutcome)
-	// {
-	// 	if(!stateUnchanged)
-	// 		throw new IllegalArgumentException();
-
-	// 	return getPerformancePartialDerivative(input, desiredOutcome);
-	// }
-	// public double getPerformancePartialDerivative(double input, double desiredOutcome)
-	// {
-	// 	if(!stateUnchanged || this.input != input)
-	// 		getOutput(input);
-
-	// 	// performancePartialDerivative = getPerformancePartialDerivative()
-
-	// 	return performancePartialDerivative;
-	// }
-	// private double getPerformancePrepartialDerivative(double input, double desiredOutcome)
-	// {
-	// 	if(!stateUnchanged || this.input != input || this.desiredOutcome != desiredOutcome)
-	// 	{
-	// 		getOutput(input);
-
-	// 	}
-	// 	else
-	// 	{
-	// 		return performancePrepartialDerivative;
-	// 	}
-	// }
-
-	public double getOutput(double input)
+	public Neuron()
 	{
-		return output = (1.0 / (1 + Math.exp(-1 * (input - data.getThreshold()))));
+		weight = new JayList<Double>();
+		parent = new JayList<Neuron>();
+		child = new JayList<Neuron>();
+
+		validState = false;
+		uptodateIOput = false;
+		uptodateSigma = false;
 	}
 
-	// Getters and Setters
-	public double setWeight(double weight)
-	{ return data.setWeight(weight); }
-	public double setThreshold(double threshold)
-	{ return data.setThreshold(threshold); }
-	public Node setPreviousNode(Node previousNode)
-	{ return data.setPreviousNode(previousNode); }
-	public Node setNextNode(Node nextNode)
-	{ return data.setNextNode(nextNode); }
-	public double getWeight()
-	{ return data.getWeight(); }
-	public double getThreshold()
-	{ return data.getThreshold(); }
-	public Node getPreviousNode()
-	{ return data.getPreviousNode(); }
-	public Node getNextNode()
-	{ return data.getNextNode(); }
+	public void addParent(Neuron parent, double thisWeight)
+	{
+		this.parent.addLast(parent);
+		this.weight.addLast(thisWeight);
+		parent.child.addLast(this);
+
+		validState = true;
+		parent.validState = true;
+		uptodateIOput = false;
+		uptodateSigma = false;
+	}
+
+	public void addChild(Neuron child, double childWeight)
+	{
+		child.parent.addLast(this);
+		child.weight.addLast(childWeight);
+		this.child.addLast(child);
+
+		validState = true;
+		child.validState = true;
+		uptodateIOput = false;
+		uptodateSigma = false;
+	}
+
+	public double calculateOutput()
+	{
+		if(!validState)
+			throw new IllegalStateException();
+
+		output = 0.0;
+		input = 0.0;
+		product = 0.0;
+
+		if(isHead())
+		{
+			// Sigmoid function
+			product = input * weight.getFirst();
+			output = 1.0 / (1 + Math.exp(-product + threshold));
+		}
+		else
+		{
+			for(int j = 0; j < parent.length(); j++)
+			{
+				// Go through the deque
+				Double currentWeight = weight.addLast(weight.removeFirst());
+				// Sigmoid function
+				product += parent.get(j).calculateOutput() * currentWeight;
+				output += 1.0 / (1 + Math.exp(-product + threshold));
+			}
+		}
+
+		uptodateIOput = true;
+		uptodateSigma = false;
+		return output;
+	}
+
+	public void calculateWeight()
+	{
+		if(isHead())
+		{
+			weight.removeFirst();
+			Double newWeight = rate * input * getPDsigma();
+			weight.addLast(newWeight);
+		}
+		else
+		{
+			for(int j = 0; j < parent.length(); j++)
+			{
+				Double currentWeight = weight.removeFirst();
+				Double newWeight = currentWeight + (rate * input * getPDsigma());
+				weight.addLast(newWeight);
+			}
+		}
+
+		uptodateIOput = false;
+		uptodateSigma = false;
+	}
+
+	private double getPDsigma()
+	{
+		// if(uptodateSigma)
+			// return sigma;
+
+		if(!uptodateIOput)
+			calculateOutput();
+
+		if(isLeaf())
+		{
+			sigma = (output * (1 - output) * (desired - output));
+		}
+		else
+		{
+			sigma = output * (1 - output) * getTotal();
+		}
+
+		uptodateSigma = true;
+		return sigma;
+	}
+
+	private double getTotal()
+	{
+		double total = 0.0;
+
+		if(isLeaf())
+			return weight.getFirst();
+
+		for(int j = 0; j < parent.length(); j++)
+		{
+			for(int k = 0; k < parent.get(j).weight.length(); k++)
+			{
+				// System.out.println(parent.length() + " " + parent.get(j).weight.length());
+				total += (parent.get(j).weight.get(k) * parent.get(j).getPDsigma()) + parent.get(j).getTotal();
+			}
+		}
+
+		return total;
+	}
+
+	public void setDesired(double desired)
+	{
+		this.desired = desired;
+	}
+
+	public void setInput(double input, double weight)
+	{
+		this.input = input;
+		this.weight.addLast(weight);
+		uptodateIOput = false;
+		uptodateSigma = false;
+	}
+
+	public int getNumChild()
+	{
+		if(!validState)
+			throw new IllegalStateException();
+
+		if(isLeaf())
+			return 0;
+
+		return child.length();
+	}
+
+	public boolean isHead()
+	{
+		if(!validState)
+			throw new IllegalStateException();
+
+		return parent.length() == 0;
+	}
+
+	public boolean isLeaf()
+	{
+		if(!validState)
+			throw new IllegalStateException();
+
+		return child.length() == 0;
+	}
 }
