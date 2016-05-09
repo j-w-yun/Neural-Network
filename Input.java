@@ -8,6 +8,11 @@ public class Input extends ValuedElement implements DifferentiableElement
 	public Input(String name, Double value)
 	{
 		super(name, value);
+
+		output = 0.0;
+		outputCached = false;
+		dOutdX = 0.0;
+		dOutdXCached = false;
 	}
 
 	public Double output()
@@ -15,7 +20,7 @@ public class Input extends ValuedElement implements DifferentiableElement
 		if(outputCached)
 			return output;
 
-
+		// TODO
 
 		outputCached = true;
 		return output;
@@ -26,7 +31,7 @@ public class Input extends ValuedElement implements DifferentiableElement
 		if(dOutdXCached)
 			return dOutdX;
 
-
+		// TODO
 
 		dOutdXCached = true;
 		return dOutdX;
