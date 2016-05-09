@@ -1,5 +1,10 @@
 import java.util.*;
 
+/**
+*	@author Jaewan Yun (Jay50@pitt.edu)
+*	@version 1.0.0
+*/
+
 public class Neuron<T extends DifferentiableElement> implements DifferentiableElement
 {
 	private Double output;
@@ -13,6 +18,10 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 
 	private Hashtable myDescendantWeights;
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public Neuron(String name, T[] inputs, Weight[] inputWeights)
 	{
 		assert inputs.length == inputWeights.length;
@@ -33,6 +42,10 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		myDescendantWeights = null;
 	}
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	@SuppressWarnings("unchecked") public Hashtable getDescendantWeights()
 	{
 		if(myDescendantWeights == null)
@@ -51,8 +64,11 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 					Hashtable descendants = ((Neuron) input).getDescendantWeights();
 					for(Object key : descendants.keySet())
 					{
+						// TODO : test this
 						HashSet hs = (HashSet) myDescendantWeights.get(weightName);
 						hs.addAll((HashSet) descendants.get((String) key));
+						hs.add((String) key);
+						myDescendantWeights.put(weightName, hs);
 					}
 				}
 			}
@@ -61,6 +77,42 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		return myDescendantWeights;
 	}
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public boolean isDecendantWeightOf(ValuedElement target, Weight weight) throws Exception
+	{
+		Hashtable weights_ = getDescendantWeights();
+		if(weights_.contains(weight.getName()))
+			return weights_.contains(target.getName());
+		else
+			throw new Exception("weight " + weight + " does not connect to node " + this);
+	}
+
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public boolean hasWeight(Weight weight)
+	{
+		Hashtable weights_ = getDescendantWeights();
+		return weights_.contains(weight.getName());
+	}
+
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public Weight[] getWeightNodes()
+	{
+		return weights;
+	}
+
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public Double output()
 	{
 		if(outputCached)
@@ -72,6 +124,10 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		return output;
 	}
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public Double dOutdX()
 	{
 		if(dOutdXCached)
@@ -83,6 +139,10 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		return dOutdX;
 	}
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public void clearCache()
 	{
 		output = 0.0;

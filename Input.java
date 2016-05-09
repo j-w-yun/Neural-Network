@@ -1,3 +1,8 @@
+/**
+*	@author Jaewan Yun (Jay50@pitt.edu)
+*	@version 1.0.0
+*/
+
 public class Input extends ValuedElement implements DifferentiableElement
 {
 	private Double output;
@@ -5,6 +10,10 @@ public class Input extends ValuedElement implements DifferentiableElement
 	private Double dOutdX;
 	private boolean dOutdXCached;
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public Input(String name, Double value)
 	{
 		super(name, value);
@@ -15,6 +24,10 @@ public class Input extends ValuedElement implements DifferentiableElement
 		dOutdXCached = false;
 	}
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public Double output()
 	{
 		if(outputCached)
@@ -26,6 +39,10 @@ public class Input extends ValuedElement implements DifferentiableElement
 		return output;
 	}
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public Double dOutdX()
 	{
 		if(dOutdXCached)
@@ -37,6 +54,10 @@ public class Input extends ValuedElement implements DifferentiableElement
 		return dOutdX;
 	}
 
+	/**
+	*	@since 1.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
 	public void clearCache()
 	{
 		output = 0.0;
