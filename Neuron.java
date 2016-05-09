@@ -33,7 +33,7 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		myDescendantWeights = null;
 	}
 
-	public Hashtable getDescendantWeights()
+	@SuppressWarnings("unchecked") public Hashtable getDescendantWeights()
 	{
 		if(myDescendantWeights == null)
 		{
@@ -48,11 +48,11 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 				myDescendantWeights.put(weightName, new HashSet());
 				if(!(input instanceof Input))
 				{
-					@SuppressWarnings("unchecked")
-					Hashtable descendants = ((Neuron)input).getDescendantWeights();
-					for(int k = 0; k < descendants.size(); k++)
+					Hashtable descendants = ((Neuron) input).getDescendantWeights();
+					for(Object key : descendants.keySet())
 					{
-
+						HashSet hs = (HashSet) myDescendantWeights.get(weightName);
+						hs.addAll((HashSet) descendants.get((String) key));
 					}
 				}
 			}
