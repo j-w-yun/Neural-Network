@@ -94,7 +94,7 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 	*	@since 1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public boolean hasWeight(Weight weight)
+	public boolean hasWeight(ValuedElement weight)
 	{
 		Hashtable weights_ = getDescendantWeights();
 		return weights_.contains(weight.getName());
@@ -117,23 +117,40 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 	{
 		if(outputCached)
 			return output;
+		else
+		{
+			Double out = 0.0;
+			for(int j = 0; j < inputs.length; j++)
+			{
+				out += weights[j].getValue() * inputs[j].output();
+			}
 
-		// TODO
+			output = (1.0 / (1.0 + Math.exp(-out)));
+		}
 
 		outputCached = true;
 		return output;
 	}
 
 	/**
+	*	Backpropagation (gradient ascent - note that performance calculation is factored negative)
 	*	@since 1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public Double dOutdX()
+	public Double dOutdX(ValuedElement element)
 	{
 		if(dOutdXCached)
 			return dOutdX;
+		else
+		{
+			// Double out = output();
+			// Double temp = out * (1 - out);
 
-		// TODO
+			// if(hasWeight(element))
+			// {
+			// 	int index = weights;
+			// }
+		}
 
 		dOutdXCached = true;
 		return dOutdX;
