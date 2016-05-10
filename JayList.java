@@ -589,7 +589,7 @@ public class JayList<T>
 			toReturn[j] = jayList[newTailIndex++ % capacity];
 		}
 
-		return toReturn;
+		return (T[]) toReturn;
 	}
 
 	/**
@@ -753,6 +753,7 @@ public class JayList<T>
 	{
 		for(int j = 0; j < size; j++)
 		{
+			System.out.println(entry.getName());
 			if(entry.getName().equals(((DifferentiableElement) get(j)).getName()))
 			{
 				return true;

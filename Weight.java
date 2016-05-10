@@ -6,6 +6,8 @@
 public class Weight extends ValuedElement
 {
 	private Double nextValue;
+	private String name;
+	private Double value;
 
 	/**
 	*	@since 1.0
@@ -14,6 +16,8 @@ public class Weight extends ValuedElement
 	public Weight(String name, Double value)
 	{
 		super(name, value);
+		this.name = name;
+		this.value = value;
 		nextValue = null;
 	}
 

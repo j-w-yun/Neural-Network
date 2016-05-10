@@ -1,15 +1,15 @@
 public class Network
 {
 	JayList inputs;
-	JayList weights;
+	JayList<Weight> weights;
 	PerformanceElement performanceNode;
 	Double output;
-	JayList neurons;
+	JayList<DifferentiableElement> neurons;
 
 	@SuppressWarnings("unchecked") public Network(PerformanceElement performanceNode, JayList neurons)
 	{
 		inputs = new JayList();
-		weights = new JayList();
+		weights = new JayList<Weight>();
 		this.performanceNode = performanceNode;
 		// output = performanceNode.getInput();
 		this.neurons = neurons;
@@ -34,18 +34,22 @@ public class Network
 		}
 		// weights.reverse();
 		weights.clear();
-		for(DifferentiableElement i : ((DifferentiableElement[]) (neurons.toArray())))
+		for(Object i : neurons.toArray())
 		{
 			// TODO test this
-			weights.addLast(((Neuron) i).getWeightNodes());
+			weights.setArray(((Neuron) i).getWeightNodes());
 		}
 	}
 
 	public void clearCache()
 	{
-		for(DifferentiableElement i : ((DifferentiableElement[]) (neurons.toArray())))
+		for(int j = 0; j < neurons.length(); j++)
 		{
-			i.clearCache();
+			neurons.get(j).clearCache();
 		}
+		// for(Object i : neurons.toArray())
+		// {
+		// 	// i.clearCache();
+		// }
 	}
 }

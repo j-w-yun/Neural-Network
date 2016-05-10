@@ -14,8 +14,8 @@ public class ValuedElement
 	*/
 	public ValuedElement(String name, Double value)
 	{
-		this.name = name;
-		this.value = value;
+		// this.name = name;
+		// this.value = value;
 	}
 
 	/**

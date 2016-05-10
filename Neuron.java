@@ -126,6 +126,7 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 			Double out = 0.0;
 			for(int j = 0; j < myInputs.length; j++)
 			{
+				// System.out.println(myInputs[j].output());
 				out += myWeights[j].getValue() * myInputs[j].output();
 			}
 
