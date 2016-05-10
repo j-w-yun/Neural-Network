@@ -647,7 +647,7 @@ public class JayList<T>
 	*
 	*	@return true if sort was successful; false if no values exist.
 	*	@throws UnsupportedOperationException if object types are not comparable.
-	*	@since 1.1.0
+	*	@since 2.0.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
 	@SuppressWarnings("unchecked") public synchronized boolean sort()
@@ -743,6 +743,38 @@ public class JayList<T>
 	public synchronized String toString()
 	{
 		return Arrays.toString(jayList);
+	}
+
+	/**
+	*	@since 2.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized boolean contains(DifferentiableElement entry)
+	{
+		for(int j = 0; j < size; j++)
+		{
+			if(entry.getName().equals(((DifferentiableElement) get(j)).getName()))
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	*	@since 2.0.0
+	*	@author Jaewan Yun (Jay50@pitt.edu)
+	*/
+	public synchronized boolean reverse()
+	{
+		JayList<T> temp = new JayList<T>();
+		for(int j = 0; j < size; j++)
+		{
+			temp.addFirst(removeFirst());
+		}
+		jayList = temp.toArray();
+		return true;
 	}
 
 	/**
