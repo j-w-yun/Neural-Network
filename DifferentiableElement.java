@@ -7,7 +7,9 @@ public interface DifferentiableElement
 {
 	public abstract Double output();
 
-	// public abstract Double dOutdX();
+	public abstract Double dOutdX(ValuedElement element);
 
 	public void clearCache();
+
+	public String getName();
 }

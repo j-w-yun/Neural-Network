@@ -30,28 +30,16 @@ public class Input extends ValuedElement implements DifferentiableElement
 	*/
 	public Double output()
 	{
-		if(outputCached)
-			return output;
-
-		// TODO
-
-		outputCached = true;
-		return output;
+		return this.value;
 	}
 
 	/**
 	*	@since 1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public Double dOutdX()
+	public Double dOutdX(ValuedElement element)
 	{
-		if(dOutdXCached)
-			return dOutdX;
-
-		// TODO
-
-		dOutdXCached = true;
-		return dOutdX;
+		return 0.0;
 	}
 
 	/**

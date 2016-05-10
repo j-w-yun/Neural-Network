@@ -12,11 +12,11 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 	private Double dOutdX;
 	private boolean dOutdXCached;
 
-	private String name;
-	private T[] inputs;
-	private Weight[] weights;
+	private String myName;
+	private T[] myInputs;
+	private Weight[] myWeights;
 
-	private Hashtable myDescendantWeights;
+	private HashMap myDescendantWeights;
 
 	/**
 	*	@since 1.0
@@ -28,17 +28,18 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		for(int j = 0; j < inputs.length; j++)
 		{
 			assert (inputs[j] instanceof Input || inputs[j] instanceof Neuron);
-			assert weights[j] instanceof Weight;
+			assert inputWeights[j] instanceof Weight;
 		}
+
+		this.myName = name;
+		this.myInputs = inputs;
+		this.myWeights = inputWeights;
 
 		output = 0.0;
 		outputCached = false;
 		dOutdX = 0.0;
 		dOutdXCached = false;
 
-		this.name = name;
-		this.inputs = inputs;
-		this.weights = inputWeights;
 		myDescendantWeights = null;
 	}
 
@@ -46,22 +47,22 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 	*	@since 1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	@SuppressWarnings("unchecked") public Hashtable getDescendantWeights()
+	@SuppressWarnings("unchecked") public HashMap getDescendantWeights()
 	{
 		if(myDescendantWeights == null)
 		{
-			myDescendantWeights = new Hashtable();
+			myDescendantWeights = new HashMap();
 			// T[] tempInputs = Arrays.copyOf(inputs, inputs.length);
 			// Weight[] tempWeights = Arrays.copyOf(weights, weights.length);
-			for(int j = 0; j < weights.length; j++)
+			for(int j = 0; j < myWeights.length; j++)
 			{
-				Weight weight = weights[j];
-				String weightName = weight.getName();
-				T input = inputs[j];
+				Weight weight = myWeights[j];
+				String weightName = myWeights[j].getName();
 				myDescendantWeights.put(weightName, new HashSet());
+				T input = myInputs[j];
 				if(!(input instanceof Input))
 				{
-					Hashtable descendants = ((Neuron) input).getDescendantWeights();
+					HashMap descendants = ((Neuron) input).getDescendantWeights();
 					for(Object key : descendants.keySet())
 					{
 						// TODO : test this
@@ -81,13 +82,16 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 	*	@since 1.0
 	*	@author Jaewan Yun (Jay50@pitt.edu)
 	*/
-	public boolean isDecendantWeightOf(ValuedElement target, Weight weight) throws Exception
+	public boolean isDecendantWeightOf(ValuedElement target, Weight weight)
 	{
-		Hashtable weights_ = getDescendantWeights();
-		if(weights_.contains(weight.getName()))
-			return weights_.contains(target.getName());
+		HashMap weights = getDescendantWeights();
+		if(weights.containsKey(weight.getName()))
+			return weights.containsKey(target.getName());
 		else
-			throw new Exception("weight " + weight + " does not connect to node " + this);
+		{
+			System.out.println("weight " + weight + " does not connect to node " + this);
+			return false;
+		}
 	}
 
 	/**
@@ -96,8 +100,8 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 	*/
 	public boolean hasWeight(ValuedElement weight)
 	{
-		Hashtable weights_ = getDescendantWeights();
-		return weights_.contains(weight.getName());
+		HashMap weights = getDescendantWeights();
+		return weights.containsKey(weight.getName());
 	}
 
 	/**
@@ -106,7 +110,7 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 	*/
 	public Weight[] getWeightNodes()
 	{
-		return weights;
+		return myWeights;
 	}
 
 	/**
@@ -120,9 +124,9 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		else
 		{
 			Double out = 0.0;
-			for(int j = 0; j < inputs.length; j++)
+			for(int j = 0; j < myInputs.length; j++)
 			{
-				out += weights[j].getValue() * inputs[j].output();
+				out += myWeights[j].getValue() * myInputs[j].output();
 			}
 
 			output = (1.0 / (1.0 + Math.exp(-out)));
@@ -143,13 +147,39 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 			return dOutdX;
 		else
 		{
-			// Double out = output();
-			// Double temp = out * (1 - out);
+			Double out = output();
+			Double temp = out * (1 - out);
 
-			// if(hasWeight(element))
-			// {
-			// 	int index = weights;
-			// }
+			if(hasWeight(element))
+			{
+				int index = 0;
+				for(int j = 0; j < myWeights.length; j++)
+				{
+					if(myWeights[j].getName() == element.getName() &&
+						myWeights[j].getValue() == element.getValue())
+					{
+						index = j;
+						break;
+					}
+				}
+
+				Double oa = myInputs[index].output();
+				dOutdX = temp * oa;
+			}
+			else
+			{
+				dOutdX = 0.0;
+				for(int j = 0; j < myWeights.length; j++)
+				{
+					Weight currentWeight = myWeights[j];
+					if(isDecendantWeightOf(element, currentWeight))
+					{
+						Double inputDeriv = myInputs[j].dOutdX(element);
+						dOutdX += currentWeight.getValue() * inputDeriv;
+					}
+				}
+				dOutdX += temp;
+			}
 		}
 
 		dOutdXCached = true;
@@ -166,5 +196,20 @@ public class Neuron<T extends DifferentiableElement> implements DifferentiableEl
 		outputCached = false;
 		dOutdX = 0.0;
 		dOutdXCached = false;
+	}
+
+	public Weight[] getWeights()
+	{
+		return myWeights;
+	}
+
+	public T[] getInputs()
+	{
+		return myInputs;
+	}
+
+	public String getName()
+	{
+		return myName;
 	}
 }
