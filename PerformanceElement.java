@@ -1,34 +1,36 @@
-public class PerformanceElement<T extends DifferentiableElement> implements DifferentiableElement
+class PerformanceElement extends DifferentiableElement
 {
-	private T myInput;
-	private Double myDesiredValue;
+	private DifferentiableElement input;
+	private double desiredValue;
 
-	public PerformanceElement(T input, Double desiredValue)
+	PerformanceElement(DifferentiableElement input, double desiredValue)
 	{
-		assert input instanceof Input || input instanceof Neuron;
-		myInput = input;
-		myDesiredValue = desiredValue;
+		this.input = input;
+		this.desiredValue = desiredValue;
 	}
 
-	public Double output()
+	double output()
 	{
-		return -0.5 * (myDesiredValue - myInput.output()) * (myDesiredValue - myInput.output());
+		return -0.5 * (desiredValue - input.output()) * (desiredValue - input.output());
 	}
 
-	public Double dOutdX(ValuedElement element)
+	double dOutdX(Weight element)
 	{
-		return (myDesiredValue - myInput.output() * myInput.dOutdX(element));
+		return (desiredValue - input.output()) * input.dOutdX(element);
 	}
 
-	public void clearCache() {}
-
-	public void setDesired(Double newDesired)
+	void setDesired(double desiredValue)
 	{
-		myDesiredValue = newDesired;
+		this.desiredValue = desiredValue;
 	}
 
-	public T getInput()
+	DifferentiableElement getInput()
 	{
-		return myInput;
+		return input;
+	}
+
+	String getName()
+	{
+		return null;
 	}
 }

@@ -1,56 +1,36 @@
-/**
-*	@author Jaewan Yun (Jay50@pitt.edu)
-*	@version 1.0.0
-*/
-
-public class Input extends ValuedElement implements DifferentiableElement
+class Input extends DifferentiableElement
 {
-	private Double output;
-	private boolean outputCached;
-	private Double dOutdX;
-	private boolean dOutdXCached;
+	private String name;
+	private double value;
 
-	/**
-	*	@since 1.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	public Input(String name, Double value)
+	Input(String name, double value)
 	{
-		super(name, value);
-
-		output = 0.0;
-		outputCached = false;
-		dOutdX = 0.0;
-		dOutdXCached = false;
+		this.name = name;
+		this.value = value;
 	}
 
-	/**
-	*	@since 1.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	public Double output()
+	double output()
 	{
-		return this.value;
+		return value;
 	}
 
-	/**
-	*	@since 1.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	public Double dOutdX(ValuedElement element)
+	double dOutdX(Weight element)
 	{
-		return 0.0;
+		return 0;
 	}
 
-	/**
-	*	@since 1.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	public void clearCache()
+	void setValue(double value)
 	{
-		output = 0.0;
-		outputCached = false;
-		dOutdX = 0.0;
-		dOutdXCached = false;
+		this.value = value;
+	}
+
+	double getValue()
+	{
+		return value;
+	}
+
+	String getName()
+	{
+		return name;
 	}
 }

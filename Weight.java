@@ -1,41 +1,37 @@
-/**
-*	@author Jaewan Yun (Jay50@pitt.edu)
-*	@version 1.0.0
-*/
-
-public class Weight extends ValuedElement
+class Weight
 {
-	private Double nextValue;
 	private String name;
-	private Double value;
+	private double value;
+	private double nextValue;
 
-	/**
-	*	@since 1.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	public Weight(String name, Double value)
+	Weight(String name, double value)
 	{
-		super(name, value);
 		this.name = name;
 		this.value = value;
-		nextValue = null;
 	}
 
-	/**
-	*	@since 1.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	public void setNextValue(Double nextValue)
+	void setNextValue(double nextValue)
 	{
 		this.nextValue = nextValue;
 	}
 
-	/**
-	*	@since 1.0
-	*	@author Jaewan Yun (Jay50@pitt.edu)
-	*/
-	public void update()
+	void update()
 	{
 		value = nextValue;
+	}
+
+	void setValue(double value)
+	{
+		this.value = value;
+	}
+
+	double getValue()
+	{
+		return value;
+	}
+
+	String getName()
+	{
+		return name;
 	}
 }
